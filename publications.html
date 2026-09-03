@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LIBRARY | gguggum art centre</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="site-header"></div>
+
+<main class="wrap">
+  <div class="pub-banner">
+    <img src="img/publications_banner.png" alt="Library">
+  </div>
+
+  <nav class="news-tabs" id="pub-tabs">
+    <button type="button" class="news-tab active" data-category="book">Book</button>
+    <button type="button" class="news-tab" data-category="catalog">Catalog</button>
+    <button type="button" class="news-tab" data-category="goods">Goods</button>
+  </nav>
+
+  <button type="button" class="gg-add-btn" data-gg-add="ggPublications" data-gg-add-category="book" hidden>+ 출판물 추가</button>
+
+  <div class="pub-list" id="pub-list"></div>
+</main>
+
+<div id="site-footer"></div>
+
+<script src="js/publications.js"></script>
+<script src="js/render.js"></script>
+<script src="js/common.js"></script>
+<script src="js/admin.js"></script>
+<script>
+  ggSite.mount("publications");
+  if (window.ggAdmin) ggAdmin.applyOverrides();
+
+  var currentCategory = "book";
+
+  (function () {
+    var tabs = document.querySelectorAll("#pub-tabs .news-tab");
+    var params = new URLSearchParams(window.location.search);
+    var initial = params.get("tab") || "book";
+
+    function setActive(category) {
+      currentCategory = category;
+      tabs.forEach(function (t) {
+        t.classList.toggle("active", t.dataset.category === category);
+      });
+      var addBtn = document.querySelector('[data-gg-add="ggPublications"]');
+      if (addBtn) addBtn.setAttribute("data-gg-add-category", category);
+      paint();
+    }
+
+    tabs.forEach(function (t) {
+      t.addEventListener("click", function () {
+        setActive(t.dataset.category);
+      });
+    });
+
+    window.__ggPubSetActive = setActive;
+    setActive(["book", "catalog", "goods"].includes(initial) ? initial : "book");
+  })();
+
+  function paint() {
+    ggRender.renderPublications("pub-list", currentCategory);
+  }
+
+  if (window.ggAdmin) {
+    ggAdmin.registerRerender(paint);
+    ggAdmin.init();
+  }
+</script>
+</body>
+</html>
